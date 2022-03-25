@@ -4,5 +4,5 @@ import com.example.hrmanagementb9.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoleRepository extends JpaRepository<Role, Integer> {
-    boolean existByName(String name);
+    boolean existsByName(String name);
 }

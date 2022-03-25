@@ -17,4 +17,7 @@ public class Company {
 
     @Column(nullable = false)
     private String name;
+
+    @OneToOne
+    private Employee director;
 }

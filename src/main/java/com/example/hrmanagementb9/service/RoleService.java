@@ -14,18 +14,19 @@ public class RoleService {
     @Autowired
     RoleRepository roleRepository;
 
-    public ApiResponce getRole(){
+    public ApiResponce getRole() {
         List<Role> roles = roleRepository.findAll();
-        return new ApiResponce("mana",true,roles);
+        return new ApiResponce("mana", true, roles);
     }
-    public ApiResponce addRole(@RequestBody Role role){
-        if(roleRepository.existByName(role.getName())){
-            return new ApiResponce("This role exist",false);
+
+    public ApiResponce addRole(@RequestBody Role role) {
+        if (roleRepository.existsByName(role.getName())) {
+            return new ApiResponce("This role exist", false);
         }
         Role role1 = new Role();
         role1.setName(role.getName());
         Role savedRole = roleRepository.save(role1);
-        return new ApiResponce("Role added",true,savedRole);
+        return new ApiResponce("Role added", true, savedRole);
     }
 }
 

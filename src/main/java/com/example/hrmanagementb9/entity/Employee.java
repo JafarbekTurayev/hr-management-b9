@@ -3,6 +3,8 @@ package com.example.hrmanagementb9.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -21,19 +23,29 @@ public class Employee implements UserDetails {
     @GeneratedValue
     private UUID id = UUID.randomUUID();
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
+    public Employee(String username, String password, String email, Role roles, boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.roles = roles;
+        this.enabled = enabled;
+    }
+
     @Email
-    @Column(unique = true,nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(updatable = false,nullable = false)
+    @CreationTimestamp
+    @Column(updatable = false, nullable = false)
     private Timestamp createdAt;
 
+    @UpdateTimestamp
     @Column(nullable = false)
     private Timestamp updatedAt;
 
@@ -45,10 +57,10 @@ public class Employee implements UserDetails {
 
     private boolean active = true;
 
-    private boolean accountNonExpired = false;
-    private boolean accountNonLocked = false;
-    private boolean credentialsNonExpired = false;
-    private boolean enabled = false;
+    private boolean accountNonExpired = true;
+    private boolean accountNonLocked = true;
+    private boolean credentialsNonExpired = true;
+    private boolean enabled ;
 
 
     ///=======================================================================
