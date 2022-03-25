@@ -36,7 +36,7 @@ public class Dataloader implements CommandLineRunner {
             Role manager = roleRepository.save(new Role(2, "MANAGER"));
             Role user = roleRepository.save(new Role(3, "USER"));
 
-            Employee jafar = employeeRepository.save(new Employee("jafar", passwordEncoder.encode("123"), "jafarbek1997@gmail.com", director, true));
+            Employee jafar = employeeRepository.save(new Employee("jafar", passwordEncoder.encode("12345"), "jafarbek1997@gmail.com", director, true));
             companyRepository.save(new Company(1, "PDP", jafar));
 
         }

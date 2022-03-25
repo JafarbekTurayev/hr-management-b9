@@ -1,10 +1,12 @@
 package com.example.hrmanagementb9.controller;
 
+import com.example.hrmanagementb9.dto.ApiResponce;
 import com.example.hrmanagementb9.dto.EmployeeDTO;
 import com.example.hrmanagementb9.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,6 +21,13 @@ public class EmployeeController {
     @GetMapping
     public HttpEntity<?> getAll(){
        return ResponseEntity.ok().body(employeeService.getAll());
+    }
+
+    @PreAuthorize("hasAuthority('DIRECTOR')")
+    @PostMapping("/addManager")
+    public HttpEntity<?> addManager(EmployeeDTO dto){
+        ApiResponce apiResponce = employeeService.addManager(dto);
+        return ResponseEntity.status(apiResponce.getSuccess() ? 201 : 409).body(apiResponce);
     }
 
     @PostMapping

@@ -1,8 +1,7 @@
 package com.example.hrmanagementb9.config;
 
-import com.example.hrmanagementb9.entity.Employee;
 import com.example.hrmanagementb9.service.AuthService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,26 +15,34 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
+    @Autowired
+    JwtProvider jwtProvider;
 
-    private final JwtProvider jwtProvider;
-    private final AuthService authService;
+    @Autowired
+    AuthService authService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader("Authorization");
-        if (authorization.startsWith("Bearer")) {
-            String token = authorization.substring(7);
+        String token = request.getHeader("Authorization");
+        //validate expired kimga tegishli
+        token = token.substring(7);
+        if (jwtProvider.validateToken(token)) {
+            if (jwtProvider.expireToken(token)) {
+                String username = jwtProvider.getUsernameFromToken(token);
+                UserDetails userDetails = authService.loadUserByUsername(username);
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities())
+                );
 
-            String username = jwtProvider.getUsernameFromToken(token);
 
-            UserDetails userDetails = authService.loadUserByUsername(username);
+                System.out.println(SecurityContextHolder.getContext().getAuthentication());
+            }
 
-            Employee employee = (Employee) userDetails;
-
-            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDetails,null,employee.getAuthorities()));
         }
-        filterChain.doFilter(request,response);
+        System.out.println(SecurityContextHolder.getContext().getAuthentication());
+
+        doFilter(request, response, filterChain);
+
     }
 }

@@ -5,6 +5,7 @@ import com.example.hrmanagementb9.dto.EmployeeDTO;
 import com.example.hrmanagementb9.entity.Employee;
 import com.example.hrmanagementb9.entity.TurniKet;
 import com.example.hrmanagementb9.repository.EmployeeRepository;
+import com.example.hrmanagementb9.repository.RoleRepository;
 import com.example.hrmanagementb9.repository.TurniKetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class EmployeeService {
     EmployeeRepository employeeRepository;
     @Autowired
     TurniKetRepository turniKetRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     public ApiResponce getAll() {
         List<Employee> all = employeeRepository.findAll();
@@ -50,8 +54,8 @@ public class EmployeeService {
         emp.setUsername(dto.getUsername());
         emp.setPassword(dto.getPassword());
         emp.setEmail(dto.getEmail());
-        emp.setRoles(dto.getRole());
-        emp.setActive(dto.getActive());
+        emp.setRoles(roleRepository.getById(dto.getRoleId()));
+
         employeeRepository.save(emp);
         return new ApiResponce("edited", true, emp);
     }
@@ -63,6 +67,32 @@ public class EmployeeService {
         }
         employeeRepository.delete(employee.get());
         return new ApiResponce("deleted", true);
+    }
+
+    public ApiResponce addManager(EmployeeDTO dto) {
+
+        String email = dto.getEmail();
+        String password = dto.getPassword();
+        Integer roleId = dto.getRoleId();
+        String username = dto.getUsername();
+
+        if (employeeRepository.existsByUsername(username) || employeeRepository.existsByEmail(email)) {
+            return new ApiResponce("Something went wrong",false);
+        }
+
+        if (roleRepository.existsById(roleId)) {
+            // agar shunaqa rol bo'lsa :
+            Employee employee = new Employee();
+
+            employee.setPassword(password);
+            employee.setUsername(username);
+            employee.setEmail(email);
+            employee.setRoles(roleRepository.getById(2));
+
+            Employee save = employeeRepository.save(employee);
+            return new ApiResponce(" added",true,save);
+        }
+        return new ApiResponce("something went wrong",false);
     }
 
 }

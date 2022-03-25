@@ -1,84 +1,61 @@
 package com.example.hrmanagementb9.config;
 
-import io.jsonwebtoken.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
 import java.util.Date;
-import java.util.Set;
 
 @Component
-
-public class JwtProvider { // maqsad : tokenlar bilan ishlash
-
-
-    private final String secretKey = "Unicorn B9";
-
-    private final long experation = 1000 * 60 * 60 * 24; // 1kun
+public class JwtProvider {
+    //    @Value("${jwt.secretKey}")
+    private String secretKey = "Super";
+    //    @Value("${jwt.expireTime}")
+    private long expire = 86400 * 1000;
 
     public String generateToken(String username) {
-
-        try {
-            String token = Jwts.builder()
-                    .setSubject(username)
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + experation))
-                    .signWith(SignatureAlgorithm.HS512, secretKey)
-                    .compact();
-            return token;
-        } catch (Exception e) {
-            throw new UsernameNotFoundException("Username topilmadi");
-        }
+        return Jwts.builder()
+                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expire))
+                .compact();
     }
 
     public String getUsernameFromToken(String token) {
-        try {
-                // validation
-            if (validateToken(token)) {
-                String username = Jwts.parser()
-                        .setSigningKey(secretKey)
-                        .parseClaimsJws(token)
-                        .getBody()
-                        .getSubject();
-                return username;
-            }
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 
-        } catch (ExpiredJwtException e) {
-            e.printStackTrace();
-        } catch (UnsupportedJwtException e) {
-            e.printStackTrace();
-        } catch (MalformedJwtException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+    public boolean expireToken(String token) {
+        try {
+
+            Date expiration = Jwts
+                    .parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+            return expiration.after(new Date());
+        } catch (Exception e) {
+            return false;
         }
-        return null;
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
+            Jwts
+                    .parser()
                     .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getExpiration().after(new Date());
+                    .parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            e.printStackTrace();
-        } catch (UnsupportedJwtException e) {
-            e.printStackTrace();
-        } catch (MalformedJwtException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
-
-
 }

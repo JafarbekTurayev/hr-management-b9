@@ -12,6 +12,11 @@ public class EmployeeDTO {
     private String username;
     private String password;
     private String email;
-    private Role role;
-    private Boolean active;
+    private Integer roleId;
+
+    public EmployeeDTO(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 }

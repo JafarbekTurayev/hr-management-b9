@@ -27,6 +27,8 @@ public class AuthController {
     @PostMapping( "/login")
     public HttpEntity<?> login(@RequestBody LoginDTO loginDTO){
         String token = jwtProvider.generateToken(loginDTO.getUserName());
+
+
         return ResponseEntity.ok().body(token);
 
     }
